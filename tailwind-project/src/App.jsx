@@ -1,8 +1,8 @@
 function App() {
   return (
-    <>
-      <h1 className="text-blue-500"> Hello world with React and TailwindCss</h1>
-    </>
+    <div>
+      <h1>Bem vindo a página principal!</h1>
+    </div>
   );
 }
 
