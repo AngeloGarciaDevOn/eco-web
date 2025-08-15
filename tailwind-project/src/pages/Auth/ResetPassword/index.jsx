@@ -15,7 +15,6 @@ export default function ResetPassword() {
 
   const handleReset = (data) => {
     console.log("Solicitação de redefinição:", data);
-    // Aqui você enviaria um link de redefinição para o email
   };
 
   return (
