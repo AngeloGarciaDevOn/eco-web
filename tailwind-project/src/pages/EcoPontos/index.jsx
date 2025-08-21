@@ -1,163 +1,145 @@
 import React, { useState } from "react";
 
 function EcoPontos() {
-  const [ecoPontos, setEcoPontos] = useState([
-    { token: "A1B2C3D4E5F6", location: "Downtown Recycling Center", type: "Recycling", status: "Active", updated: "2024-01-15 10:00 AM" },
-    { token: "G7H8I9J0K1L2", location: "Uptown Composting Facility", type: "Composting", status: "Inactive", updated: "2023-12-20 02:30 PM" },
-    { token: "M3N4O5P6Q7R8", location: "Industrial Park Waste Station", type: "General Waste", status: "Active", updated: "2024-02-01 09:15 AM" },
-  ]);
+  const [ecoPoints, setEcoPoints] = useState([]); // lista inicialmente vazia
+  const [showModal, setShowModal] = useState(false); // controla modal
+  const [newEcoPoint, setNewEcoPoint] = useState({ id: "", location: "" });
 
-  const [filters, setFilters] = useState({ location: "", type: "", status: "" });
-
-  const [formData, setFormData] = useState({
-    token: "",
-    location: "",
-    type: "",
-    status: "Active",
-  });
-
-  // Atualiza o valor de um campo do formulário
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleAddEcoPoint = () => {
+    setShowModal(true);
   };
 
-  // Adiciona novo Eco Ponto
-  const handleAddEcoPonto = () => {
-    if (!formData.token || !formData.location || !formData.type) {
-      alert("Preencha todos os campos!");
-      return;
-    }
-    const newEcoPonto = {
-      ...formData,
+  const handleChange = (e) => {
+    setNewEcoPoint({ ...newEcoPoint, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!newEcoPoint.id || !newEcoPoint.location) return;
+
+    const newPoint = {
+      id: newEcoPoint.id,
+      location: newEcoPoint.location,
+      status: "Empty",
+      capacity: "0%",
       updated: new Date().toLocaleString(),
     };
-    setEcoPontos((prev) => [...prev, newEcoPonto]);
-    setFormData({ token: "", location: "", type: "", status: "Active" });
+
+    setEcoPoints([...ecoPoints, newPoint]);
+    setNewEcoPoint({ id: "", location: "" });
+    setShowModal(false);
   };
 
-  // Aplica filtros
-  const filteredEcoPontos = ecoPontos.filter((ponto) => {
-    return (
-      (filters.location ? ponto.location.includes(filters.location) : true) &&
-      (filters.type ? ponto.type === filters.type : true) &&
-      (filters.status ? ponto.status === filters.status : true)
-    );
-  });
-
   return (
-    <div className="px-10 flex flex-col py-5 text-white">
-      {/* Cabeçalho */}
-      <div className="flex justify-between items-center p-4">
-        <h1 className="text-[32px] font-bold">Eco Pontos</h1>
-      </div>
+    <div className="px-40 flex flex-1 justify-center py-5">
+      <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+        {/* Header */}
+        <div className="flex flex-wrap justify-between gap-3 p-4">
+          <p className="text-[#0e1b14] tracking-light text-[32px] font-bold leading-tight min-w-72">
+            Eco Points
+          </p>
+          <button
+            onClick={handleAddEcoPoint}
+            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#e7f3ed] text-[#0e1b14] text-sm font-medium leading-normal"
+          >
+            <span className="truncate">Add Eco Point</span>
+          </button>
+        </div>
 
-      {/* Filtros */}
-      <div className="flex gap-3 p-3 flex-wrap">
-        <select
-          className="bg-[#293238] rounded-lg p-2"
-          value={filters.location}
-          onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
-        >
-          <option value="">Filtrar por Local</option>
-          {ecoPontos.map((p) => (
-            <option key={p.token} value={p.location}>
-              {p.location}
-            </option>
-          ))}
-        </select>
+        {/* Tabela só aparece se houver dados */}
+        {ecoPoints.length > 0 && (
+          <div className="px-4 py-3 @container">
+            <div className="flex overflow-hidden rounded-lg border border-[#d0e7db] bg-[#f8fcfa]">
+              <table className="flex-1">
+                <thead>
+                  <tr className="bg-[#f8fcfa]">
+                    <th className="px-4 py-3 text-left text-[#0e1b14] w-[200px] text-sm font-medium">
+                      Eco Point ID
+                    </th>
+                    <th className="px-4 py-3 text-left text-[#0e1b14] w-[400px] text-sm font-medium">
+                      Location
+                    </th>
+                    <th className="px-4 py-3 text-left text-[#0e1b14] w-40 text-sm font-medium">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-[#0e1b14] w-40 text-sm font-medium">
+                      Capacity
+                    </th>
+                    <th className="px-4 py-3 text-left text-[#0e1b14] w-[250px] text-sm font-medium">
+                      Last Updated
+                    </th>
+                    <th className="px-4 py-3 text-left text-[#4e9773] w-40 text-sm font-medium">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ecoPoints.map((point) => (
+                    <tr key={point.id} className="border-t border-t-[#d0e7db]">
+                      <td className="px-4 py-2">{point.id}</td>
+                      <td className="px-4 py-2 text-[#4e9773]">
+                        {point.location}
+                      </td>
+                      <td className="px-4 py-2">
+                        <button className="w-full h-8 px-4 rounded-lg bg-[#e7f3ed] text-sm font-medium">
+                          {point.status}
+                        </button>
+                      </td>
+                      <td className="px-4 py-2">{point.capacity}</td>
+                      <td className="px-4 py-2">{point.updated}</td>
+                      <td className="px-4 py-2 text-[#4e9773] font-bold">
+                        View Details
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
-        <select
-          className="bg-[#293238] rounded-lg p-2"
-          value={filters.type}
-          onChange={(e) => setFilters((prev) => ({ ...prev, type: e.target.value }))}
-        >
-          <option value="">Filtrar por Tipo</option>
-          <option value="Recycling">Recycling</option>
-          <option value="Composting">Composting</option>
-          <option value="General Waste">General Waste</option>
-        </select>
-
-        <select
-          className="bg-[#293238] rounded-lg p-2"
-          value={filters.status}
-          onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
-        >
-          <option value="">Filtrar por Status</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
-      </div>
-
-      {/* Tabela */}
-      <div className="overflow-hidden rounded-lg border border-[#3c4a53]">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-[#1c2226]">
-              <th className="p-3 text-left">Token</th>
-              <th className="p-3 text-left">Location</th>
-              <th className="p-3 text-left">Type</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Last Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEcoPontos.map((ponto, index) => (
-              <tr key={index} className="border-t border-[#3c4a53]">
-                <td className="p-3">{ponto.token}</td>
-                <td className="p-3">{ponto.location}</td>
-                <td className="p-3">{ponto.type}</td>
-                <td className="p-3">{ponto.status}</td>
-                <td className="p-3">{ponto.updated}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Formulário */}
-      <h2 className="mt-6 text-xl font-bold">Add New Eco Point</h2>
-      <div className="flex flex-wrap gap-4 mt-3">
-        <input
-          name="token"
-          placeholder="Token"
-          value={formData.token}
-          onChange={handleChange}
-          className="bg-[#293238] p-3 rounded-lg"
-        />
-        <input
-          name="location"
-          placeholder="Location"
-          value={formData.location}
-          onChange={handleChange}
-          className="bg-[#293238] p-3 rounded-lg"
-        />
-        <select
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          className="bg-[#293238] p-3 rounded-lg"
-        >
-          <option value="">Select Type</option>
-          <option value="Recycling">Recycling</option>
-          <option value="Composting">Composting</option>
-          <option value="General Waste">General Waste</option>
-        </select>
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="bg-[#293238] p-3 rounded-lg"
-        >
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
-        <button
-          onClick={handleAddEcoPonto}
-          className="bg-[#1993e5] text-white p-3 rounded-lg font-bold"
-        >
-          Add Eco Point
-        </button>
+        {/* Modal */}
+        {showModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-lg p-6 w-[400px] shadow-lg">
+              <h2 className="text-xl font-bold mb-4">Add Eco Point</h2>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  name="id"
+                  placeholder="Eco Point ID"
+                  value={newEcoPoint.id}
+                  onChange={handleChange}
+                  className="border rounded-lg px-3 py-2"
+                />
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="Location"
+                  value={newEcoPoint.location}
+                  onChange={handleChange}
+                  className="border rounded-lg px-3 py-2"
+                />
+                <div className="flex justify-end gap-2 mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-lg bg-green-600 text-white"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
